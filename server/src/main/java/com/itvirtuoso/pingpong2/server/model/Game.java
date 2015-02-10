@@ -19,7 +19,13 @@ public class Game {
     }
 
     public void addPlayer2(Player player2) {
+        if (player2 == null) {
+            throw new IllegalArgumentException("player2 needs instance");
+        }
         mPlayer2 = player2;
+
+        mPlayer1.onReady();
+        mPlayer2.onReady();
     }
 
     public Player getPlayer1() {
