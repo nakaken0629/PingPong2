@@ -31,6 +31,13 @@ public class GameTest {
     }
 
     @Test
+    public void 存在しないIDでGameオブジェクトを取得するとnullが返る() throws Exception {
+        Player player1 = new NothingPlayer();
+        Game game = Game.create(player1);
+        assertNull("存在しないIDでnullではないオブジェクトが返ってきた", Game.get(game.getId() + 1));
+    }
+
+    @Test
     public void 二人目のプレイヤーを追加する() throws Exception {
         Player player1 = new NothingPlayer();
         Game game = Game.create(player1);
