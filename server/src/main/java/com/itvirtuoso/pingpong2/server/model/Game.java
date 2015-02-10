@@ -5,6 +5,7 @@ package com.itvirtuoso.pingpong2.server.model;
  */
 public class Game {
     private Player mPlayer1;
+    private Player mPlayer2;
 
     private Game(Player player1) {
         mPlayer1 = player1;
@@ -17,7 +18,15 @@ public class Game {
         return new Game(player1);
     }
 
+    public void addPlayer2(Player player2) {
+        mPlayer2 = player2;
+    }
+
     public Player getPlayer1() {
         return mPlayer1;
+    }
+
+    public Player getPlayer2() {
+        return mPlayer2;
     }
 }
