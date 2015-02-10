@@ -15,13 +15,16 @@ public class Game {
         if (player1 == null) {
             throw new IllegalArgumentException("player1 needs instance");
         }
-        return new Game(player1);
+        Game game = new Game(player1);
+        player1.setGame(game);
+        return game;
     }
 
     public void addPlayer2(Player player2) {
         if (player2 == null) {
             throw new IllegalArgumentException("player2 needs instance");
         }
+        player2.setGame(this);
         mPlayer2 = player2;
 
         mPlayer1.onReady();
@@ -34,5 +37,10 @@ public class Game {
 
     public Player getPlayer2() {
         return mPlayer2;
+    }
+
+    public void onServe() {
+        mPlayer1.onServe();
+        mPlayer2.onServe();
     }
 }
