@@ -3,8 +3,6 @@ package com.itvirtuoso.pingpong2.server.model;
 /**
  * Created by nakagaki on 2015/02/09.
  */
-public class Player {
-    public void onReady() {
-
-    }
+public abstract class Player {
+    public abstract void onReady();
 }
