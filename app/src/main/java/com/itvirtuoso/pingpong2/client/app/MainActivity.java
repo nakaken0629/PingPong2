@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.itvirtuoso.pingpong2.R;
 
@@ -52,15 +53,26 @@ public class MainActivity extends ActionBarActivity {
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
+        private Button mConnectButton;
 
         public PlaceholderFragment() {
+            /* nop */
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            mConnectButton = (Button) rootView.findViewById(R.id.connect_button);
+            mConnectButton.setOnClickListener(new ConnectButtonClickListener());
             return rootView;
+        }
+
+        private class ConnectButtonClickListener implements View.OnClickListener {
+            @Override
+            public void onClick(View v) {
+
+            }
         }
     }
 }
