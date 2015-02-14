@@ -1,18 +1,24 @@
 package com.itvirtuoso.pingpong2.client.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.itvirtuoso.pingpong2.R;
+import com.itvirtuoso.pingpong2.client.model.Game;
+import com.itvirtuoso.pingpong2.client.model.GameListener;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements GameListener {
     private static final String TAG = MainActivity.class.getName();
+    private Game mGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +29,22 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+    }
+
+    public void connectAsDefender() {
+        mGame = Game.createInstance(new Handler(), this);
+        String host = getString(R.string.server_host);
+        int port = Integer.parseInt(getString(R.string.server_port));
+        mGame.connect(host, port);
+    }
+
+    @Override
+    public void onConnectionFail(Exception e) {
+        Log.e(TAG, "connection failed", e);
+        new AlertDialog.Builder(this)
+                .setTitle("エラー")
+                .setMessage("接続に失敗しました")
+                .create().show();
     }
 
     /**
@@ -54,7 +76,7 @@ public class MainActivity extends ActionBarActivity {
         private class ConnectButtonClickListener implements View.OnClickListener {
             @Override
             public void onClick(View v) {
-                /* TOOD */
+                mActivity.connectAsDefender();
             }
         }
     }
