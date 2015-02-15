@@ -3,7 +3,6 @@ package com.itvirtuoso.pingpong2.client.app;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -13,12 +12,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.itvirtuoso.pingpong2.R;
-import com.itvirtuoso.pingpong2.client.model.Game;
+import com.itvirtuoso.pingpong2.client.model.GameConnection;
 import com.itvirtuoso.pingpong2.client.model.GameListener;
 
-public class MainActivity extends ActionBarActivity implements GameListener {
+public class MainActivity extends ActionBarActivity {
     private static final String TAG = MainActivity.class.getName();
-    private Game mGame;
+    private GameConnection mConnection;
+    private GameListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,19 +32,41 @@ public class MainActivity extends ActionBarActivity implements GameListener {
     }
 
     public void connectAsDefender() {
-        mGame = Game.createInstance(new Handler(), this);
+        mConnection = GameConnection.createInstance();
         String host = getString(R.string.server_host);
         int port = Integer.parseInt(getString(R.string.server_port));
-        mGame.connect(host, port);
+        mListener = new AbstractGameListener() {
+            @Override
+            public void onConnectionSuccess() {
+                waitChallenger();
+            }
+        };
+        mConnection.connect(host, port, mListener);
     }
 
-    @Override
-    public void onConnectionFail(Exception e) {
-        Log.e(TAG, "connection failed", e);
-        new AlertDialog.Builder(this)
-                .setTitle("エラー")
-                .setMessage("接続に失敗しました")
-                .create().show();
+    private abstract class AbstractGameListener implements GameListener {
+        @Override
+        public void onConnectionFail(Exception e) {
+            Log.e(TAG, "connection fail", e);
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("エラー")
+                    .setMessage("接続に失敗しました")
+                    .create().show();
+        }
+
+        @Override
+        public void onSendFail(Exception e) {
+            Log.e(TAG, "send fail", e);
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("エラー")
+                    .setMessage("パケット送信に失敗しました")
+                    .create().show();
+        }
+
+        @Override
+        public void waitChallenger() {
+            mConnection.waitChallenger();
+        }
     }
 
     /**
