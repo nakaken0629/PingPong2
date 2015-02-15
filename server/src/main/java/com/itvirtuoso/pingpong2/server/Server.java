@@ -4,7 +4,7 @@ import com.itvirtuoso.pingpong2.server.model.SocketPlayer;
 
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
@@ -19,8 +19,9 @@ public class Server {
             listener.bind(new InetSocketAddress(5000));
             while (true) {
                 SocketPlayer player = new SocketPlayer(listener.accept());
-                Executor executor = Executors.newSingleThreadExecutor();
+                ExecutorService executor = Executors.newSingleThreadExecutor();
                 executor.execute(player);
+                executor.shutdown();
             }
         }
     }

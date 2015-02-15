@@ -2,6 +2,8 @@ package com.itvirtuoso.pingpong2.client.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -10,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.itvirtuoso.pingpong2.R;
 import com.itvirtuoso.pingpong2.client.model.GameConnection;
@@ -18,7 +21,6 @@ import com.itvirtuoso.pingpong2.client.model.GameListener;
 public class MainActivity extends ActionBarActivity {
     private static final String TAG = MainActivity.class.getName();
     private GameConnection mConnection;
-    private GameListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,16 +34,31 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void connectAsDefender() {
-        mConnection = GameConnection.createInstance();
-        String host = getString(R.string.server_host);
-        int port = Integer.parseInt(getString(R.string.server_port));
-        mListener = new AbstractGameListener() {
+        GameListener listener = new AbstractGameListener() {
             @Override
             public void onConnectionSuccess() {
                 waitChallenger();
             }
         };
-        mConnection.connect(host, port, mListener);
+        connect(listener);
+    }
+
+
+    public void connectAsChallenger(final int gameId) {
+        GameListener listener = new AbstractGameListener() {
+            @Override
+            public void onConnectionSuccess() {
+                challenge(gameId);
+            }
+        };
+        connect(listener);
+    }
+
+    private void connect(GameListener listener) {
+        mConnection = GameConnection.createInstance();
+        String host = getString(R.string.server_host);
+        int port = Integer.parseInt(getString(R.string.server_port));
+        mConnection.connect(host, port, listener);
     }
 
     private abstract class AbstractGameListener implements GameListener {
@@ -79,6 +96,30 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onWaitChallenger(int gameId) {
             Log.d(TAG, "game id = " + gameId);
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("情報")
+                    .setMessage("ゲームIDは \"" + gameId + "\"です")
+                    .create().show();
+        }
+
+        public void challenge(int gameId) {
+            mConnection.challenge(gameId);
+        }
+
+        @Override
+        public void onChallengeSuccess() {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("情報")
+                    .setMessage("対戦を開始します")
+                    .create().show();
+        }
+
+        @Override
+        public void onChallengeFail() {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("情報")
+                    .setMessage("対戦を開始できませんでした")
+                    .create().show();
         }
     }
 
@@ -88,6 +129,7 @@ public class MainActivity extends ActionBarActivity {
     public static class PlaceholderFragment extends Fragment {
         private MainActivity mActivity;
         private Button mConnectButton;
+        private Button mChallengeButton;
 
         public PlaceholderFragment() {
             /* nop */
@@ -99,6 +141,8 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             mConnectButton = (Button) rootView.findViewById(R.id.connect_button);
             mConnectButton.setOnClickListener(new ConnectButtonClickListener());
+            mChallengeButton = (Button) rootView.findViewById(R.id.challenge_button);
+            mChallengeButton.setOnClickListener(new ChallengeButtonClickListener());
             return rootView;
         }
 
@@ -112,6 +156,25 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 mActivity.connectAsDefender();
+            }
+        }
+
+        private class ChallengeButtonClickListener implements View.OnClickListener {
+            @Override
+            public void onClick(View v) {
+                Context context = getView().getContext();
+                final EditText gameIdEdit = new EditText(context);
+                new AlertDialog.Builder(context)
+                        .setTitle("入力")
+                        .setView(gameIdEdit)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int gameId = Integer.parseInt(gameIdEdit.getText().toString().trim());
+                                mActivity.connectAsChallenger(gameId);
+                            }
+                        }).setNegativeButton("キャンセル", null)
+                        .create().show();
             }
         }
     }

@@ -15,4 +15,13 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="challenge"
+        android:id="@+id/challenge_button"
+        android:layout_marginTop="36dp"
+        android:layout_below="@+id/connect_button"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

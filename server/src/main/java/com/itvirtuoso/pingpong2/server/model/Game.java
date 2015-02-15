@@ -1,5 +1,6 @@
 package com.itvirtuoso.pingpong2.server.model;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -42,14 +43,11 @@ public class Game {
             throw new IllegalArgumentException("player2 needs instance");
         }
         mPlayer2 = player2;
-
     }
 
-    public Player getPlayer1() {
-        return mPlayer1;
-    }
-
-    public Player getPlayer2() {
-        return mPlayer2;
+    public void ready() throws IOException, InterruptedException {
+        Thread.sleep(1000);
+        mPlayer1.onReady();
+        mPlayer2.onReady();
     }
 }
