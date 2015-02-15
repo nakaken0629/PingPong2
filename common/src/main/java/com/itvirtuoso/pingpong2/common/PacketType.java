@@ -4,6 +4,7 @@ package com.itvirtuoso.pingpong2.common;
  */
 public enum PacketType {
     WAIT_CHALLENGER(1),
+    ON_WAIT_CHALLENGER(101),
     TERMINATE(255),
     ;
 

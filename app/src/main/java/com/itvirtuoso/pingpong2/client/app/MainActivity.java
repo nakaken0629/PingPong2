@@ -64,8 +64,21 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
+        public void onReceiveFail(Exception e) {
+            Log.e(TAG, "receive fail", e);
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("エラー")
+                    .setMessage("パケット受信に失敗しました")
+                    .create().show();
+        }
+
         public void waitChallenger() {
             mConnection.waitChallenger();
+        }
+
+        @Override
+        public void onWaitChallenger(int gameId) {
+            Log.d(TAG, "game id = " + gameId);
         }
     }
 

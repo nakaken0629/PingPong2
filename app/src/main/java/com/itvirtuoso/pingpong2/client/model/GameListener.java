@@ -7,5 +7,6 @@ public interface GameListener {
     public void onConnectionSuccess();
     public void onConnectionFail(Exception e);
     public void onSendFail(Exception e);
-    public void waitChallenger();
+    public void onReceiveFail(Exception e);
+    public void onWaitChallenger(int gameId);
 }

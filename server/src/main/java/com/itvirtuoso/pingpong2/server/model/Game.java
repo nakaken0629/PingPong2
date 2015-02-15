@@ -17,19 +17,15 @@ public class Game {
     }
 
     public static Game create(Player player1) {
-        if (player1 == null) {
-            throw new IllegalArgumentException("player1 needs instance");
-        }
         Game game = new Game(player1);
         while(true) {
-            Integer id = Integer.valueOf((int) (Math.random() * 1000) + 1000);
+            Integer id = Integer.valueOf((int) (Math.random() * 9000) + 1000);
             if (!sGames.containsKey(id)) {
                 game.mId = id;
                 sGames.put(id, game);
                 break;
             }
         }
-        player1.setGame(game);
         return game;
     }
 
@@ -45,11 +41,8 @@ public class Game {
         if (player2 == null) {
             throw new IllegalArgumentException("player2 needs instance");
         }
-        player2.setGame(this);
         mPlayer2 = player2;
 
-        mPlayer1.onReady();
-        mPlayer2.onReady();
     }
 
     public Player getPlayer1() {
@@ -58,10 +51,5 @@ public class Game {
 
     public Player getPlayer2() {
         return mPlayer2;
-    }
-
-    public void onServe() {
-        mPlayer1.onServe();
-        mPlayer2.onServe();
     }
 }
