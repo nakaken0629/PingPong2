@@ -79,6 +79,7 @@ public class SocketPlayer implements Player, Runnable {
                 break;
             case CHALLENGE:
                 doChallenge(data);
+                break;
             default:
                 sLogger.warning(type + " is an invalid type");
         }

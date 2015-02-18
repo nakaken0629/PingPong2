@@ -2,6 +2,7 @@ package com.itvirtuoso.pingpong2.client.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -121,6 +122,17 @@ public class MainActivity extends ActionBarActivity {
                     .setMessage("対戦を開始できませんでした")
                     .create().show();
         }
+
+        @Override
+        public void onReady() {
+            Log.d(TAG, "onReady");
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            RacketFragment fragment = RacketFragment.newInstance();
+            transaction.add(R.id.container, fragment);
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
     }
 
     /**
@@ -132,7 +144,7 @@ public class MainActivity extends ActionBarActivity {
         private Button mChallengeButton;
 
         public PlaceholderFragment() {
-            /* nop */
+            /* Required empty public constructor */
         }
 
         @Override
@@ -150,6 +162,12 @@ public class MainActivity extends ActionBarActivity {
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             mActivity = (MainActivity) activity;
+        }
+
+        @Override
+        public void onDetach() {
+            super.onDetach();
+            mActivity = null;
         }
 
         private class ConnectButtonClickListener implements View.OnClickListener {

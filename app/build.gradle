@@ -22,10 +22,8 @@ android {
     }
     productFlavors {
         emulator {
-
         }
         develop {
-
         }
     }
 }

@@ -11,4 +11,5 @@ public interface GameListener {
     void onWaitChallenger(int gameId);
     void onChallengeSuccess();
     void onChallengeFail();
+    void onReady();
 }
