@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +63,7 @@ public class TitleFragment extends Fragment {
         public void onClick(View v) {
             Context context = getView().getContext();
             final EditText gameIdEdit = new EditText(context);
+            gameIdEdit.setInputType(InputType.TYPE_CLASS_TEXT);
             new AlertDialog.Builder(context)
                     .setTitle("入力")
                     .setView(gameIdEdit)
