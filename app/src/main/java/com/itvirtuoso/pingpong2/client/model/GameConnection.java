@@ -145,7 +145,7 @@ public class GameConnection {
                 doOnChallengeFail(data);
                 break;
             case ON_READY:
-                doOnRead(data);
+                doOnReady(data);
                 break;
             default:
                 Log.w(TAG, type + " is an invalid type");
@@ -180,7 +180,7 @@ public class GameConnection {
         });
     }
 
-    private void doOnRead(List<Integer> data) {
+    private void doOnReady(List<Integer> data) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
