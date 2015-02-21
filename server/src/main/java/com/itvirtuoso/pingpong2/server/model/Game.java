@@ -10,15 +10,17 @@ public class Game {
     private static HashMap<Integer, Game> sGames = new HashMap<>();
 
     private Integer mId;
+    private GameMode mMode;
+    private Player mPlayer0;
     private Player mPlayer1;
-    private Player mPlayer2;
 
-    private Game(Player player1) {
-        mPlayer1 = player1;
+    private Game(Player player0) {
+        mPlayer0 = player0;
+        mPlayer0.setType(PlayerType.PLAYER0);
     }
 
-    public static Game create(Player player1) {
-        Game game = new Game(player1);
+    public static Game create(Player player0) {
+        Game game = new Game(player0);
         while(true) {
             Integer id = Integer.valueOf((int) (Math.random() * 9000) + 1000);
             if (!sGames.containsKey(id)) {
@@ -38,16 +40,29 @@ public class Game {
         return sGames.get(Integer.valueOf(id));
     }
 
-    public void addPlayer2(Player player2) {
-        if (player2 == null) {
-            throw new IllegalArgumentException("player2 needs instance");
+    public void addPlayer1(Player player1) {
+        if (player1 == null) {
+            throw new IllegalArgumentException("player1 needs instance");
         }
-        mPlayer2 = player2;
+        mPlayer1 = player1;
+        mPlayer1.setType(PlayerType.PLAYER1);
     }
 
     public void ready() throws IOException, InterruptedException {
-        Thread.sleep(1000);
+        mMode = GameMode.PLAYER0_WAIT_SERVE;
+        mPlayer0.onReady();
         mPlayer1.onReady();
-        mPlayer2.onReady();
+    }
+
+    public void swing(Player player) throws IOException {
+        if (player.getType() == PlayerType.PLAYER0 && mMode == GameMode.PLAYER0_WAIT_SERVE) {
+            serveAsPlayer0();
+            return;
+        }
+    }
+
+    private void serveAsPlayer0() throws IOException {
+        mPlayer0.onServe();
+        mPlayer1.onServe();
     }
 }

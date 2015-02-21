@@ -114,6 +114,21 @@ public class GameConnection {
         service.shutdown();
     }
 
+    public void swing() {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(new GameRunner(mHandler) {
+            @Override
+            public void execute() throws IOException {
+                sendPacket(PacketType.SWING);
+            }
+
+            @Override
+            public void onException(Exception e) {
+                mListener.onSwingFail();
+            }
+        });
+    }
+
     private void receivePacket() throws IOException {
         InputStream stream = mSocket.getInputStream();
         ArrayList<Integer> data = new ArrayList<>();
@@ -146,6 +161,9 @@ public class GameConnection {
                 break;
             case ON_READY:
                 doOnReady(data);
+                break;
+            case ON_SERVE:
+                doOnServe(data);
                 break;
             default:
                 Log.w(TAG, type + " is an invalid type");
@@ -185,6 +203,15 @@ public class GameConnection {
             @Override
             public void run() {
                 mListener.onReady();
+            }
+        });
+    }
+
+    private void doOnServe(List<Integer> data) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onServe();
             }
         });
     }

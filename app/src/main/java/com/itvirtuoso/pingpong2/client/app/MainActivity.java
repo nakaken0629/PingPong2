@@ -53,6 +53,10 @@ public class MainActivity extends ActionBarActivity {
         mConnection.connect(host, port, listener);
     }
 
+    public void swing() {
+        mConnection.swing();
+    }
+
     private abstract class AbstractGameListener implements GameListener {
         @Override
         public void onConnectionFail(Exception e) {
@@ -124,6 +128,18 @@ public class MainActivity extends ActionBarActivity {
             transaction.addToBackStack(null);
             transaction.commit();
         }
-    }
 
+        @Override
+        public void onSwingFail() {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("情報")
+                    .setMessage("スイングに失敗しました")
+                    .create().show();
+        }
+
+        @Override
+        public void onServe() {
+            Log.d(TAG, "onServe");
+        }
+    }
 }

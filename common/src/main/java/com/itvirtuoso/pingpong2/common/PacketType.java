@@ -5,10 +5,12 @@ package com.itvirtuoso.pingpong2.common;
 public enum PacketType {
     WAIT_CHALLENGER(1),
     CHALLENGE(2),
+    SWING(3),
     ON_WAIT_CHALLENGER(101),
     ON_CHALLENGE_FAIL(102),
     ON_CHALLENGE_SUCCESS(103),
     ON_READY(104),
+    ON_SERVE(105),
     TERMINATE(255);
 
     private final int mValue;

@@ -12,4 +12,6 @@ public interface GameListener {
     void onChallengeSuccess();
     void onChallengeFail();
     void onReady();
+    void onSwingFail();
+    void onServe();
 }

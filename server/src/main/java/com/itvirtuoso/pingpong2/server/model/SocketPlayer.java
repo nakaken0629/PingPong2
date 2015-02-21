@@ -19,6 +19,7 @@ public class SocketPlayer implements Player, Runnable {
     private static final Logger sLogger = Logger.getLogger(SocketPlayer.class.getName());
     private Socket mSocket;
     private Game mGame;
+    private PlayerType mPlayerType;
 
     public SocketPlayer(Socket socket) {
         mSocket = socket;
@@ -71,6 +72,16 @@ public class SocketPlayer implements Player, Runnable {
         }
     }
 
+    @Override
+    public void setType(PlayerType playerType) {
+        mPlayerType = playerType;
+    }
+
+    @Override
+    public PlayerType getType() {
+        return mPlayerType;
+    }
+
     private void doAction(PacketType type, List<Integer> data) throws IOException {
         sLogger.info("Packet Type = " + type + ", data = " + StringUtils.join(data, ", "));
         switch (type) {
@@ -79,6 +90,9 @@ public class SocketPlayer implements Player, Runnable {
                 break;
             case CHALLENGE:
                 doChallenge(data);
+                break;
+            case SWING:
+                doSwing(data);
                 break;
             default:
                 sLogger.warning(type + " is an invalid type");
@@ -99,7 +113,7 @@ public class SocketPlayer implements Player, Runnable {
             sendPacket(PacketType.ON_CHALLENGE_FAIL);
             return;
         }
-        mGame.addPlayer2(this);
+        mGame.addPlayer1(this);
         sendPacket(PacketType.ON_CHALLENGE_SUCCESS);
 
         try {
@@ -112,5 +126,14 @@ public class SocketPlayer implements Player, Runnable {
     @Override
     public void onReady() throws IOException {
         sendPacket(PacketType.ON_READY);
+    }
+
+    private void doSwing(List<Integer> data) throws IOException {
+        mGame.swing(this);
+    }
+
+    @Override
+    public void onServe() throws IOException {
+        sendPacket(PacketType.ON_SERVE);
     }
 }
