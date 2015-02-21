@@ -73,12 +73,12 @@ public class SocketPlayer implements Player, Runnable {
     }
 
     @Override
-    public void setType(PlayerType playerType) {
+    public void setPlayerType(PlayerType playerType) {
         mPlayerType = playerType;
     }
 
     @Override
-    public PlayerType getType() {
+    public PlayerType getPlayerType() {
         return mPlayerType;
     }
 

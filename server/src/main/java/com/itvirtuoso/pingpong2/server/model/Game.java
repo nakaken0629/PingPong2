@@ -16,7 +16,7 @@ public class Game {
 
     private Game(Player player0) {
         mPlayer0 = player0;
-        mPlayer0.setType(PlayerType.PLAYER0);
+        mPlayer0.setPlayerType(PlayerType.PLAYER0);
     }
 
     public static Game create(Player player0) {
@@ -45,7 +45,7 @@ public class Game {
             throw new IllegalArgumentException("player1 needs instance");
         }
         mPlayer1 = player1;
-        mPlayer1.setType(PlayerType.PLAYER1);
+        mPlayer1.setPlayerType(PlayerType.PLAYER1);
     }
 
     public void ready() throws IOException, InterruptedException {
@@ -55,7 +55,7 @@ public class Game {
     }
 
     public void swing(Player player) throws IOException {
-        if (player.getType() == PlayerType.PLAYER0 && mMode == GameMode.PLAYER0_WAIT_SERVE) {
+        if (player.getPlayerType() == PlayerType.PLAYER0 && mMode == GameMode.PLAYER0_WAIT_SERVE) {
             serveAsPlayer0();
             return;
         }
