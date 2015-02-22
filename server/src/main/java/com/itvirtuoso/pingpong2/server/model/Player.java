@@ -8,6 +8,9 @@ import java.io.IOException;
 public interface Player {
     void setPlayerType(PlayerType playerType);
     PlayerType getPlayerType();
+
     void onReady() throws IOException;
     void onServe() throws IOException;
+    void onFirstBound() throws IOException;
+    void onSecondBound() throws IOException;
 }

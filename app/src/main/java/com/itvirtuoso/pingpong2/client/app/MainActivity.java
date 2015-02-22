@@ -141,5 +141,15 @@ public class MainActivity extends ActionBarActivity {
         public void onServe() {
             Log.d(TAG, "onServe");
         }
+
+        @Override
+        public void onFirstBound() {
+            Log.d(TAG, "onFirstBound");
+        }
+
+        @Override
+        public void onSecondBound() {
+            Log.d(TAG, "onSecondBound");
+        }
     }
 }

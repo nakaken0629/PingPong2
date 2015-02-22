@@ -165,6 +165,12 @@ public class GameConnection {
             case ON_SERVE:
                 doOnServe(data);
                 break;
+            case ON_FIRST_BOUND:
+                doOnFirstBound(data);
+                break;
+            case ON_SECOND_BOUND:
+                doOnSecondBound(data);
+                break;
             default:
                 Log.w(TAG, type + " is an invalid type");
         }
@@ -212,6 +218,24 @@ public class GameConnection {
             @Override
             public void run() {
                 mListener.onServe();
+            }
+        });
+    }
+
+    private void doOnFirstBound(List<Integer> data) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onFirstBound();
+            }
+        });
+    }
+
+    private void doOnSecondBound(List<Integer> data) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onSecondBound();
             }
         });
     }

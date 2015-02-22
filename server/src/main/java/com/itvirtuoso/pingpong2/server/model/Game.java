@@ -2,17 +2,26 @@ package com.itvirtuoso.pingpong2.server.model;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 /**
  * Created by nakagaki on 2015/02/09.
  */
-public class Game {
+public class Game implements Runnable {
+    private static final Logger sLogger = Logger.getLogger(Game.class.getName());
+    private static final Object sLock = new Object();
     private static HashMap<Integer, Game> sGames = new HashMap<>();
 
     private Integer mId;
     private GameMode mMode;
     private Player mPlayer0;
     private Player mPlayer1;
+
+    private int interval = 500;
+
+    private ExecutorService mService = Executors.newSingleThreadExecutor();
 
     private Game(Player player0) {
         mPlayer0 = player0;
@@ -21,12 +30,14 @@ public class Game {
 
     public static Game create(Player player0) {
         Game game = new Game(player0);
-        while(true) {
-            Integer id = Integer.valueOf((int) (Math.random() * 9000) + 1000);
-            if (!sGames.containsKey(id)) {
-                game.mId = id;
-                sGames.put(id, game);
-                break;
+        synchronized (sLock) {
+            while (true) {
+                Integer id = Integer.valueOf((int) (Math.random() * 9000) + 1000);
+                if (!sGames.containsKey(id)) {
+                    game.mId = id;
+                    sGames.put(id, game);
+                    break;
+                }
             }
         }
         return game;
@@ -37,7 +48,9 @@ public class Game {
     }
 
     public static Game get(int id) {
-        return sGames.get(Integer.valueOf(id));
+        synchronized (sLock) {
+            return sGames.get(Integer.valueOf(id));
+        }
     }
 
     public void addPlayer1(Player player1) {
@@ -50,6 +63,8 @@ public class Game {
 
     public void ready() throws IOException, InterruptedException {
         mMode = GameMode.PLAYER0_WAIT_SERVE;
+        mService.execute(this);
+        mService.shutdown();
         mPlayer0.onReady();
         mPlayer1.onReady();
     }
@@ -62,7 +77,46 @@ public class Game {
     }
 
     private void serveAsPlayer0() throws IOException {
-        mPlayer0.onServe();
-        mPlayer1.onServe();
+        mMode = GameMode.PLAYER0_SERVE;
+    }
+
+    @Override
+    public void run() {
+        try {
+            runInner();
+        } catch (IOException | InterruptedException e) {
+            sLogger.severe(e.toString());
+            /* TODO: ゲーム中断処理 */
+        }
+    }
+
+    private void runInner() throws IOException, InterruptedException {
+        while(true) {
+            switch (mMode) {
+                case PLAYER0_SERVE:
+                    mPlayer0.onServe();
+                    mPlayer1.onServe();
+                    Thread.sleep(interval);
+                    mMode = GameMode.PLAYER0_FIRST_BOUND;
+                    break;
+
+                case PLAYER0_FIRST_BOUND:
+                    mPlayer0.onFirstBound();
+                    mPlayer1.onFirstBound();
+                    Thread.sleep(interval);
+                    mMode = GameMode.PLAYER0_SECOND_BOUND;
+                    break;
+
+                case PLAYER0_SECOND_BOUND:
+                    mPlayer0.onSecondBound();
+                    mPlayer1.onSecondBound();
+                    Thread.sleep(interval);
+                    mMode = GameMode.PLAYER0_WAIT_SERVE;
+                    break;
+
+                default:
+                    Thread.yield();
+            }
+        }
     }
 }

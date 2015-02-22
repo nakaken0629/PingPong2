@@ -11,6 +11,8 @@ public enum PacketType {
     ON_CHALLENGE_SUCCESS(103),
     ON_READY(104),
     ON_SERVE(105),
+    ON_FIRST_BOUND(106),
+    ON_SECOND_BOUND(107),
     TERMINATE(255);
 
     private final int mValue;

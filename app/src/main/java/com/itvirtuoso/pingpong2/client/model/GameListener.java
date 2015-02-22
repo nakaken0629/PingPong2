@@ -14,4 +14,6 @@ public interface GameListener {
     void onReady();
     void onSwingFail();
     void onServe();
+    void onFirstBound();
+    void onSecondBound();
 }

@@ -136,4 +136,14 @@ public class SocketPlayer implements Player, Runnable {
     public void onServe() throws IOException {
         sendPacket(PacketType.ON_SERVE);
     }
+
+    @Override
+    public void onFirstBound() throws IOException {
+        sendPacket(PacketType.ON_FIRST_BOUND);
+    }
+
+    @Override
+    public void onSecondBound() throws IOException {
+        sendPacket(PacketType.ON_SECOND_BOUND);
+    }
 }
