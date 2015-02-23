@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -17,9 +18,13 @@ import java.util.logging.Logger;
  */
 public class SocketPlayer implements Player, Runnable {
     private static final Logger sLogger = Logger.getLogger(SocketPlayer.class.getName());
+    private static final int SWING_TIME = 250;
+    private static final int WAIT_TIME = 1000;
+
     private Socket mSocket;
     private Game mGame;
     private PlayerType mPlayerType;
+    private Date mLastSwing = new Date(0);
 
     public SocketPlayer(Socket socket) {
         mSocket = socket;
@@ -129,7 +134,18 @@ public class SocketPlayer implements Player, Runnable {
     }
 
     private void doSwing(List<Integer> data) throws IOException {
+        Date now = new Date();
+        if (now.getTime() - mLastSwing.getTime() < WAIT_TIME) {
+            return;
+        }
+        mLastSwing = now;
+        sLogger.fine("swing");
         mGame.swing(this);
+    }
+
+    private boolean isSwing() {
+        Date now = new Date();
+        return now.getTime() - mLastSwing.getTime() < SWING_TIME;
     }
 
     @Override
