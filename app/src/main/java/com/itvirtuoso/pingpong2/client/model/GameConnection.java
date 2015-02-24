@@ -171,6 +171,9 @@ public class GameConnection {
             case ON_SECOND_BOUND:
                 doOnSecondBound(data);
                 break;
+            case ON_PAUSE:
+                doOnPause(data);
+                break;
             default:
                 Log.w(TAG, type + " is an invalid type");
         }
@@ -236,6 +239,15 @@ public class GameConnection {
             @Override
             public void run() {
                 mListener.onSecondBound();
+            }
+        });
+    }
+
+    private void doOnPause(List<Integer> data) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onPause();
             }
         });
     }

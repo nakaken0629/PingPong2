@@ -16,4 +16,5 @@ public interface GameListener {
     void onServe();
     void onFirstBound();
     void onSecondBound();
+    void onPause();
 }

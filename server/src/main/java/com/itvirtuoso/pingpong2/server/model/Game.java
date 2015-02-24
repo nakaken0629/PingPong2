@@ -19,7 +19,8 @@ public class Game implements Runnable {
     private Player mPlayer0;
     private Player mPlayer1;
 
-    private int interval = 500;
+    private int mInterval = 1000;
+    private long mNextTime;
 
     private ExecutorService mService = Executors.newSingleThreadExecutor();
 
@@ -62,22 +63,15 @@ public class Game implements Runnable {
     }
 
     public void ready() throws IOException, InterruptedException {
-        mMode = GameMode.PLAYER0_WAIT_SERVE;
+        mMode = GameMode.PLAYER0_SERVE;
         mService.execute(this);
         mService.shutdown();
         mPlayer0.onReady();
         mPlayer1.onReady();
     }
 
-    public void swing(Player player) throws IOException {
-        if (player.getPlayerType() == PlayerType.PLAYER0 && mMode == GameMode.PLAYER0_WAIT_SERVE) {
-            serveAsPlayer0();
-            return;
-        }
-    }
-
-    private void serveAsPlayer0() throws IOException {
-        mMode = GameMode.PLAYER0_SERVE;
+    private void refreshNextTime(long interval) {
+        mNextTime = System.currentTimeMillis() + interval;
     }
 
     @Override
@@ -91,32 +85,111 @@ public class Game implements Runnable {
     }
 
     private void runInner() throws IOException, InterruptedException {
-        while(true) {
+        while (true) {
+            Thread.yield();
+            if (System.currentTimeMillis() < mNextTime) {
+                continue;
+            }
             switch (mMode) {
                 case PLAYER0_SERVE:
-                    mPlayer0.onServe();
-                    mPlayer1.onServe();
-                    Thread.sleep(interval);
-                    mMode = GameMode.PLAYER0_FIRST_BOUND;
+                    doPlayer0Serve();
                     break;
-
+                case PLAYER0_RETURN:
+                    doPlayer0Return();
+                    break;
                 case PLAYER0_FIRST_BOUND:
-                    mPlayer0.onFirstBound();
-                    mPlayer1.onFirstBound();
-                    Thread.sleep(interval);
-                    mMode = GameMode.PLAYER0_SECOND_BOUND;
+                    doPlayer0FirstBound();
                     break;
-
                 case PLAYER0_SECOND_BOUND:
-                    mPlayer0.onSecondBound();
-                    mPlayer1.onSecondBound();
-                    Thread.sleep(interval);
-                    mMode = GameMode.PLAYER0_WAIT_SERVE;
+                    doPlayer0SecondBound();
                     break;
-
+                case PLAYER1_SERVE:
+                    doPlayer1Serve();
+                    break;
+                case PLAYER1_RETURN:
+                    doPlayer1Return();
+                    break;
+                case PLAYER1_FIRST_BOUND:
+                    doPlayer1FirstBound();
+                    break;
+                case PLAYER1_SECOND_BOUND:
+                    doPlayer1SecondBound();
+                    break;
                 default:
-                    Thread.yield();
+                    /* nop */
             }
         }
+    }
+
+    private void doPlayer0Serve() throws IOException, InterruptedException {
+        if (mPlayer0.isSwing()) {
+            mPlayer0.onServe();
+            mPlayer1.onServe();
+            refreshNextTime(mInterval);
+            mMode = GameMode.PLAYER0_FIRST_BOUND;
+        }
+    }
+
+    private void doPlayer0Return() throws IOException, InterruptedException {
+        if (mPlayer0.isSwing()) {
+            mPlayer0.onReturn();
+            mPlayer1.onReturn();
+            refreshNextTime(mInterval * 2);
+            mMode = GameMode.PLAYER0_SECOND_BOUND;
+        } else {
+            mPlayer0.onPause();
+            mPlayer1.onPause();
+            mMode = GameMode.PLAYER1_SERVE;
+        }
+    }
+
+    private void doPlayer0FirstBound() throws IOException, InterruptedException {
+        mPlayer0.onFirstBound();
+        mPlayer1.onFirstBound();
+        refreshNextTime(mInterval);
+        mMode = GameMode.PLAYER0_SECOND_BOUND;
+    }
+
+    private void doPlayer0SecondBound() throws IOException, InterruptedException {
+        mPlayer0.onSecondBound();
+        mPlayer1.onSecondBound();
+        refreshNextTime(mInterval);
+        mMode = GameMode.PLAYER1_RETURN;
+    }
+
+    private void doPlayer1Serve() throws IOException, InterruptedException {
+        if (mPlayer1.isSwing()) {
+            mPlayer0.onServe();
+            mPlayer1.onServe();
+            refreshNextTime(mInterval);
+            mMode = GameMode.PLAYER1_FIRST_BOUND;
+        }
+    }
+
+    private void doPlayer1Return() throws IOException, InterruptedException {
+        if (mPlayer1.isSwing()) {
+            mPlayer0.onReturn();
+            mPlayer1.onReturn();
+            refreshNextTime(mInterval * 2);
+            mMode = GameMode.PLAYER1_SECOND_BOUND;
+        } else {
+            mPlayer0.onPause();
+            mPlayer1.onPause();
+            mMode = GameMode.PLAYER0_SERVE;
+        }
+    }
+
+    private void doPlayer1FirstBound() throws IOException, InterruptedException {
+        mPlayer0.onFirstBound();
+        mPlayer1.onFirstBound();
+        refreshNextTime(mInterval);
+        mMode = GameMode.PLAYER1_SECOND_BOUND;
+    }
+
+    private void doPlayer1SecondBound() throws IOException, InterruptedException {
+        mPlayer0.onSecondBound();
+        mPlayer1.onSecondBound();
+        refreshNextTime(mInterval);
+        mMode = GameMode.PLAYER0_RETURN;
     }
 }

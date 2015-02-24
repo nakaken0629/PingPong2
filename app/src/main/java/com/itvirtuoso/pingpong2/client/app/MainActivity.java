@@ -151,5 +151,10 @@ public class MainActivity extends ActionBarActivity {
         public void onSecondBound() {
             Log.d(TAG, "onSecondBound");
         }
+
+        @Override
+        public void onPause() {
+            Log.d(TAG, "onPause");
+        }
     }
 }

@@ -13,6 +13,8 @@ public enum PacketType {
     ON_SERVE(105),
     ON_FIRST_BOUND(106),
     ON_SECOND_BOUND(107),
+    ON_PAUSE(108),
+    ON_RETURN(109),
     TERMINATE(255);
 
     private final int mValue;

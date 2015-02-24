@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -18,13 +17,13 @@ import java.util.logging.Logger;
  */
 public class SocketPlayer implements Player, Runnable {
     private static final Logger sLogger = Logger.getLogger(SocketPlayer.class.getName());
-    private static final int SWING_TIME = 250;
+    private static final int SWING_TIME = 1000;
     private static final int WAIT_TIME = 1000;
 
     private Socket mSocket;
     private Game mGame;
     private PlayerType mPlayerType;
-    private Date mLastSwing = new Date(0);
+    private long mLastSwing = 0;
 
     public SocketPlayer(Socket socket) {
         mSocket = socket;
@@ -49,6 +48,7 @@ public class SocketPlayer implements Player, Runnable {
     }
 
     private void sendPacket(PacketType type, List<Integer> data) throws IOException {
+        sLogger.info("SND Packet Type = " + type + ", data = " + StringUtils.join(data, ", "));
         synchronized (mSocket) {
             OutputStream outputStream = mSocket.getOutputStream();
             outputStream.write(type.toValue());
@@ -88,7 +88,7 @@ public class SocketPlayer implements Player, Runnable {
     }
 
     private void doAction(PacketType type, List<Integer> data) throws IOException {
-        sLogger.info("Packet Type = " + type + ", data = " + StringUtils.join(data, ", "));
+        sLogger.info("RCV Packet Type = " + type + ", data = " + StringUtils.join(data, ", "));
         switch (type) {
             case WAIT_CHALLENGER:
                 doWaitChallenger(data);
@@ -134,18 +134,17 @@ public class SocketPlayer implements Player, Runnable {
     }
 
     private void doSwing(List<Integer> data) throws IOException {
-        Date now = new Date();
-        if (now.getTime() - mLastSwing.getTime() < WAIT_TIME) {
+        long now = System.currentTimeMillis();
+        if (now - mLastSwing < WAIT_TIME) {
             return;
         }
         mLastSwing = now;
-        sLogger.fine("swing");
-        mGame.swing(this);
     }
 
-    private boolean isSwing() {
-        Date now = new Date();
-        return now.getTime() - mLastSwing.getTime() < SWING_TIME;
+    @Override
+    public boolean isSwing() {
+        long now = System.currentTimeMillis();
+        return now - mLastSwing < SWING_TIME;
     }
 
     @Override
@@ -161,5 +160,15 @@ public class SocketPlayer implements Player, Runnable {
     @Override
     public void onSecondBound() throws IOException {
         sendPacket(PacketType.ON_SECOND_BOUND);
+    }
+
+    @Override
+    public void onReturn() throws IOException {
+        sendPacket(PacketType.ON_RETURN);
+    }
+
+    @Override
+    public void onPause() throws IOException {
+        sendPacket(PacketType.ON_PAUSE);
     }
 }
