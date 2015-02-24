@@ -165,6 +165,9 @@ public class GameConnection {
             case ON_SERVE:
                 doOnServe(data);
                 break;
+            case ON_RETURN:
+                doOnReturn(data);
+                break;
             case ON_FIRST_BOUND:
                 doOnFirstBound(data);
                 break;
@@ -221,6 +224,15 @@ public class GameConnection {
             @Override
             public void run() {
                 mListener.onServe();
+            }
+        });
+    }
+
+    private void doOnReturn(List<Integer> data) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onReturn();
             }
         });
     }

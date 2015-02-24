@@ -1,6 +1,8 @@
 package com.itvirtuoso.pingpong2.client.app;
 
 import android.app.AlertDialog;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
@@ -12,7 +14,12 @@ import com.itvirtuoso.pingpong2.client.model.GameListener;
 
 public class MainActivity extends ActionBarActivity {
     private static final String TAG = MainActivity.class.getName();
+
     private GameConnection mConnection;
+    private SoundPool mSoundPool;
+    private int mkaId;
+    private int mKoId;
+    private int mWhistleId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +30,20 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, new TitleFragment())
                     .commit();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /* サウンドの登録 */
+        this.mSoundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+        this.mkaId = this.mSoundPool.load(this, R.raw.ka, 1);
+        this.mKoId = this.mSoundPool.load(this, R.raw.ko, 1);
+        this.mWhistleId = this.mSoundPool.load(this, R.raw.whistle, 1);
+    }
+
+    private void playSound(int id) {
+        this.mSoundPool.play(id, 1.0F, 1.0F, 0, 0, 1.0f);
     }
 
     public void connectAsDefender() {
@@ -140,16 +161,25 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onServe() {
             Log.d(TAG, "onServe");
+            playSound(mkaId);
+        }
+
+        @Override
+        public void onReturn() {
+            Log.d(TAG, "onReturn");
+            playSound(mkaId);
         }
 
         @Override
         public void onFirstBound() {
             Log.d(TAG, "onFirstBound");
+            playSound(mKoId);
         }
 
         @Override
         public void onSecondBound() {
             Log.d(TAG, "onSecondBound");
+            playSound(mKoId);
         }
 
         @Override
